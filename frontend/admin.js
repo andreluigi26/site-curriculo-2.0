@@ -12,6 +12,11 @@ const projetoForm = document.getElementById('admin-projeto-form');
 const projetosContainer = document.getElementById('admin-projetos');
 const btnSync = document.getElementById('btn-sync');
 const btnLogout = document.getElementById('btn-logout');
+const btnCancelEdit = document.getElementById('btn-cancel-edit');
+const projetoFormTitle = projetoForm.querySelector('h2');
+const projetoSubmitBtn = projetoForm.querySelector('button[type="submit"]');
+
+let projetoEmEdicaoId = null;
 
 function getToken() {
     return sessionStorage.getItem(TOKEN_KEY);
@@ -55,11 +60,37 @@ function toggleAdminUI(isLogged) {
     panelCard.classList.toggle('hidden', !isLogged);
 }
 
+function resetarFormularioProjeto() {
+    projetoEmEdicaoId = null;
+    projetoForm.reset();
+    projetoFormTitle.textContent = 'Novo Projeto';
+    projetoSubmitBtn.textContent = 'Salvar Projeto';
+    btnCancelEdit.classList.add('hidden');
+}
+
+function preencherFormularioEdicao(projeto) {
+    projetoEmEdicaoId = projeto._id;
+    projetoFormTitle.textContent = 'Editar Projeto';
+    projetoSubmitBtn.textContent = 'Atualizar Projeto';
+    btnCancelEdit.classList.remove('hidden');
+
+    document.getElementById('titulo').value = projeto.titulo || '';
+    document.getElementById('descricao').value = projeto.descricao || '';
+    document.getElementById('tecnologias').value = (projeto.tecnologias || []).join(', ');
+    document.getElementById('linkProjeto').value = projeto.linkProjeto || '';
+    document.getElementById('linkGithub').value = projeto.linkGithub || '';
+    document.getElementById('destaque').checked = Boolean(projeto.destaque);
+
+    projetoForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
 function renderProjetos(projetos) {
     if (!projetos.length) {
         projetosContainer.innerHTML = '<p class="admin-status">Nenhum projeto cadastrado.</p>';
         return;
     }
+
+    const projetosPorId = new Map(projetos.map((projeto) => [String(projeto._id), projeto]));
 
     projetosContainer.innerHTML = projetos.map((projeto) => `
         <article class="admin-projeto-item">
@@ -68,19 +99,39 @@ function renderProjetos(projetos) {
                 <p>${projeto.descricao || ''}</p>
                 <small>${(projeto.tecnologias || []).join(', ')}</small>
             </div>
-            <button type="button" data-id="${projeto._id}" class="btn-outline btn-delete">Excluir</button>
+            <div class="admin-projeto-acoes">
+                <button type="button" data-id="${projeto._id}" class="btn-outline btn-edit">Editar</button>
+                <button type="button" data-id="${projeto._id}" class="btn-outline btn-delete">Excluir</button>
+            </div>
         </article>
     `).join('');
 
+    document.querySelectorAll('.btn-edit').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const id = String(btn.getAttribute('data-id') || '');
+            const projeto = projetosPorId.get(id);
+            if (!projeto) {
+                syncStatus.textContent = 'Erro: projeto nao encontrado para edicao.';
+                return;
+            }
+
+            preencherFormularioEdicao(projeto);
+            syncStatus.textContent = 'Modo edicao ativado.';
+        });
+    });
+
     document.querySelectorAll('.btn-delete').forEach((btn) => {
         btn.addEventListener('click', async () => {
-            const id = btn.getAttribute('data-id');
+            const id = String(btn.getAttribute('data-id') || '');
             if (!window.confirm('Deseja remover este projeto?')) {
                 return;
             }
 
             try {
                 await api(`/projetos/${id}`, { method: 'DELETE' });
+                if (projetoEmEdicaoId === id) {
+                    resetarFormularioProjeto();
+                }
                 await carregarProjetosAdmin();
             } catch (err) {
                 syncStatus.textContent = `Erro: ${err.message}`;
@@ -139,18 +190,26 @@ projetoForm.addEventListener('submit', async (event) => {
     };
 
     try {
-        await api('/projetos', {
-            method: 'POST',
+        const emEdicao = Boolean(projetoEmEdicaoId);
+        await api(emEdicao ? `/projetos/${projetoEmEdicaoId}` : '/projetos', {
+            method: emEdicao ? 'PUT' : 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
         });
 
-        syncStatus.textContent = 'Projeto salvo com sucesso.';
-        projetoForm.reset();
+        syncStatus.textContent = emEdicao
+            ? 'Projeto atualizado com sucesso.'
+            : 'Projeto salvo com sucesso.';
+        resetarFormularioProjeto();
         await carregarProjetosAdmin();
     } catch (err) {
         syncStatus.textContent = `Erro: ${err.message}`;
     }
+});
+
+btnCancelEdit.addEventListener('click', () => {
+    resetarFormularioProjeto();
+    syncStatus.textContent = 'Edicao cancelada.';
 });
 
 btnSync.addEventListener('click', async () => {
@@ -192,4 +251,5 @@ async function iniciar() {
     }
 }
 
+resetarFormularioProjeto();
 iniciar();

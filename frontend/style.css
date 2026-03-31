@@ -427,6 +427,12 @@ h2 {
     color: var(--muted);
 }
 
+.admin-projeto-acoes {
+    display: inline-flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
 .checkbox-inline {
     display: inline-flex;
     align-items: center;
