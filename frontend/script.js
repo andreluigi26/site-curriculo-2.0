@@ -94,12 +94,20 @@ async function carregarProjetos()  {
                 </div>
             `;
         }).join('');
+
+        requestAnimationFrame(() => {
+            ajustarAlturaTabAtiva();
+        });
     } catch (error) {
         console.error('Erro ao carregar projetos:', error);
         const container = document.getElementById('lista-projetos');
         if (container) {
             container.innerHTML = '<p class="erro">Nao foi possivel carregar os projetos agora.</p>';
         }
+
+        requestAnimationFrame(() => {
+            ajustarAlturaTabAtiva();
+        });
     }
 }
 
@@ -130,6 +138,17 @@ function atualizarLinkAtivo(sectionId) {
     });
 }
 
+function ajustarAlturaTabAtiva() {
+    if (!conteudo || !isDesktopTabs() || !conteudo.classList.contains('tab-mode')) {
+        return;
+    }
+
+    const secaoAtiva = [...secoes].find((secao) => secao.classList.contains('is-visible'));
+    if (secaoAtiva) {
+        conteudo.style.minHeight = `${secaoAtiva.scrollHeight + 24}px`;
+    }
+}
+
 function ativarSecaoDesktop(sectionId) {
     if (!conteudo) {
         return;
@@ -143,9 +162,7 @@ function ativarSecaoDesktop(sectionId) {
         secao.classList.toggle('is-visible', visivel);
     });
 
-    if (secaoAtiva) {
-        conteudo.style.minHeight = `${secaoAtiva.scrollHeight + 24}px`;
-    }
+    ajustarAlturaTabAtiva();
 
     atualizarLinkAtivo(sectionId);
     localStorage.setItem(LAST_SECTION_KEY, sectionId);
