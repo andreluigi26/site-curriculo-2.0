@@ -73,7 +73,7 @@ async function carregarProjetos()  {
             const tecnologias = (projeto.tecnologias || []).map((tech) => `<span class="tecnologia">${tech}</span>`).join(' ');
             const linkProjeto = linkExternoValido(projeto.linkProjeto)
                 ? `<a href="${projeto.linkProjeto}" target="_blank" rel="noreferrer">Ver Projeto</a>`
-                : '';
+                : '<span class="link-disabled" aria-disabled="true">Sem demo</span>';
             const linkGithub = linkExternoValido(projeto.linkGithub)
                 ? `<a href="${projeto.linkGithub}" target="_blank" rel="noreferrer">GitHub</a>`
                 : '';
