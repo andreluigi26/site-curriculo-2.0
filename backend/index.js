@@ -46,6 +46,7 @@ function normalizarOrigin(origin) {
 
 function origemPermitida(origin) {
     const originNormalizada = normalizarOrigin(origin);
+    const hostnamesPermitidosVercel = ['site-curriculo-2-0', 'andreluigidev'];
 
     if (!originNormalizada) {
         return true;
@@ -57,7 +58,10 @@ function origemPermitida(origin) {
 
     try {
         const { hostname } = new URL(originNormalizada);
-        if (hostname.endsWith('.vercel.app') && hostname.startsWith('site-curriculo-2-0')) {
+        if (
+            hostname.endsWith('.vercel.app')
+            && hostnamesPermitidosVercel.some((prefixo) => hostname.startsWith(prefixo))
+        ) {
             return true;
         }
     } catch (err) {
