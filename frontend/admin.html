@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin | Andre Luigi</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <div class="grain"></div>
+    <main class="admin-wrapper">
+        <section class="admin-card" id="login-card">
+            <h1>Painel Admin</h1>
+            <p>Area restrita para manutencao do portfolio.</p>
+            <form id="admin-login-form" class="admin-form">
+                <label for="admin-username">Usuario</label>
+                <input id="admin-username" name="username" type="text" autocomplete="username" required>
+
+                <label for="admin-password">Senha</label>
+                <input id="admin-password" name="password" type="password" autocomplete="current-password" required>
+
+                <button type="submit">Entrar</button>
+            </form>
+            <p id="admin-login-status" class="admin-status" aria-live="polite"></p>
+        </section>
+
+        <section class="admin-card hidden" id="panel-card">
+            <div class="admin-actions">
+                <button type="button" id="btn-sync">Sincronizar GitHub</button>
+                <button type="button" id="btn-logout" class="btn-outline">Sair</button>
+            </div>
+            <p id="admin-sync-status" class="admin-status" aria-live="polite"></p>
+
+            <form id="admin-projeto-form" class="admin-form">
+                <h2>Novo Projeto</h2>
+                <label for="titulo">Titulo</label>
+                <input id="titulo" name="titulo" type="text" required>
+
+                <label for="descricao">Descricao</label>
+                <textarea id="descricao" name="descricao" rows="3" required></textarea>
+
+                <label for="tecnologias">Tecnologias (separadas por virgula)</label>
+                <input id="tecnologias" name="tecnologias" type="text">
+
+                <label for="linkProjeto">Link do Projeto</label>
+                <input id="linkProjeto" name="linkProjeto" type="url">
+
+                <label for="linkGithub">Link do GitHub</label>
+                <input id="linkGithub" name="linkGithub" type="url">
+
+                <label class="checkbox-inline">
+                    <input id="destaque" name="destaque" type="checkbox">
+                    Projeto em destaque
+                </label>
+
+                <button type="submit">Salvar Projeto</button>
+            </form>
+
+            <h2>Projetos Cadastrados</h2>
+            <div id="admin-projetos" class="admin-projetos"></div>
+        </section>
+    </main>
+
+    <script src="config.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>
