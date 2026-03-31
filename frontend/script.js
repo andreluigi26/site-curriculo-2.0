@@ -1,6 +1,6 @@
 const API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API_BASE)
     ? window.APP_CONFIG.API_BASE
-    : 'http://localhost:3000';
+    : 'https://site-curriculo-api.vercel.app';
 const URL_API = `${API_BASE}/projetos`;
 const LAST_SECTION_KEY = 'portfolio_last_section';
 

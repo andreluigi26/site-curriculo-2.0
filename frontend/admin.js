@@ -1,6 +1,6 @@
 const API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API_BASE)
     ? window.APP_CONFIG.API_BASE
-    : 'http://localhost:3000';
+    : 'https://site-curriculo-api.vercel.app';
 const TOKEN_KEY = 'admin_token';
 
 const loginCard = document.getElementById('login-card');
