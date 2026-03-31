@@ -37,9 +37,16 @@ async function conectarMongo() {
     await mongoConnectionPromise;
 }
 
+function normalizarOrigin(origin) {
+    return (origin || '')
+        .trim()
+        .replace(/\/+$/, '')
+        .toLowerCase();
+}
+
 const allowedOrigins = FRONTEND_URL
     .split(',')
-    .map((origin) => origin.trim())
+    .map(normalizarOrigin)
     .filter(Boolean);
 
 if (process.env.NODE_ENV !== 'production') {
@@ -52,7 +59,9 @@ app.use(cors({
             return callback(null, true);
         }
 
-        if (allowedOrigins.includes(origin)) {
+        const originNormalizada = normalizarOrigin(origin);
+
+        if (allowedOrigins.includes(originNormalizada)) {
             return callback(null, true);
         }
 
