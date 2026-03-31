@@ -4,6 +4,29 @@ const API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API_BASE)
 const URL_API = `${API_BASE}/projetos`;
 const LAST_SECTION_KEY = 'portfolio_last_section';
 
+function linkExternoValido(url) {
+    try {
+        const valor = String(url || '').trim();
+        if (!valor) {
+            return false;
+        }
+
+        const parsed = new URL(valor);
+        return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+    } catch {
+        return false;
+    }
+}
+
+function formatarDescricaoProjeto(descricao) {
+    const valor = String(descricao || '').trim();
+    if (!valor || /^descricao em breve\.?$/i.test(valor)) {
+        return 'Projeto em evolucao. Em breve adicionarei uma descricao completa com mais detalhes.';
+    }
+
+    return valor;
+}
+
 async function carregarProjetos()  {
     try {
         const resposta = await fetch(URL_API);
@@ -45,21 +68,32 @@ async function carregarProjetos()  {
             return;
         }
 
-        container.innerHTML = projetosRecentes.map(projeto => `
-            <div class="projeto-card">
-                <div class="projeto-info">
-                    <h3>${projeto.titulo || 'Projeto sem titulo'}</h3>
-                    <p>${projeto.descricao || 'Descricao em breve.'}</p>
-                    <div class="tecnologias">
-                        ${(projeto.tecnologias || []).map(tech => `<span class="tecnologia">${tech}</span>`).join(' ')}
-                    </div>
-                    <div class="links">
-                        ${projeto.linkProjeto ? `<a href="${projeto.linkProjeto}" target="_blank" rel="noreferrer">Ver Projeto</a>` : ''}
-                        ${projeto.linkGithub ? `<a href="${projeto.linkGithub}" target="_blank" rel="noreferrer">GitHub</a>` : ''}
+        container.innerHTML = projetosRecentes.map((projeto) => {
+            const descricao = formatarDescricaoProjeto(projeto.descricao);
+            const tecnologias = (projeto.tecnologias || []).map((tech) => `<span class="tecnologia">${tech}</span>`).join(' ');
+            const linkProjeto = linkExternoValido(projeto.linkProjeto)
+                ? `<a href="${projeto.linkProjeto}" target="_blank" rel="noreferrer">Ver Projeto</a>`
+                : '';
+            const linkGithub = linkExternoValido(projeto.linkGithub)
+                ? `<a href="${projeto.linkGithub}" target="_blank" rel="noreferrer">GitHub</a>`
+                : '';
+
+            return `
+                <div class="projeto-card">
+                    <div class="projeto-info">
+                        <h3>${projeto.titulo || 'Projeto sem titulo'}</h3>
+                        <p>${descricao}</p>
+                        <div class="tecnologias">
+                            ${tecnologias}
+                        </div>
+                        <div class="links">
+                            ${linkProjeto}
+                            ${linkGithub}
+                        </div>
                     </div>
                 </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
     } catch (error) {
         console.error('Erro ao carregar projetos:', error);
         const container = document.getElementById('lista-projetos');
