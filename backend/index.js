@@ -14,6 +14,25 @@ const ADMIN_USERNAME = process.env.ADMIN_USERNAME;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 const JWT_SECRET = process.env.JWT_SECRET;
 const FRONTEND_URL = process.env.FRONTEND_URL || '';
+const IS_SERVERLESS = process.env.VERCEL === '1';
+
+let mongoConnectionPromise;
+
+async function conectarMongo() {
+    if (!MONGODB_URI) {
+        throw new Error('MONGODB_URI nao definida. Configure a variavel de ambiente no servidor.');
+    }
+
+    if (mongoose.connection.readyState === 1) {
+        return;
+    }
+
+    if (!mongoConnectionPromise) {
+        mongoConnectionPromise = mongoose.connect(MONGODB_URI);
+    }
+
+    await mongoConnectionPromise;
+}
 
 const allowedOrigins = FRONTEND_URL
     .split(',')
@@ -39,10 +58,14 @@ app.use(cors({
 }));
 app.use(express.json());
 
-if (!MONGODB_URI) {
-    console.error('Variavel MONGODB_URI nao definida. Configure o arquivo .env no backend.');
-    process.exit(1);
-}
+app.use(async (req, res, next) => {
+    try {
+        await conectarMongo();
+        return next();
+    } catch (err) {
+        return res.status(500).json({ message: `Erro de conexao com banco: ${err.message}` });
+    }
+});
 
 function obterTecnologias(repo) {
     const tecnologias = new Set();
@@ -250,18 +273,18 @@ app.post('/sync-github', autenticarAdmin, async (req, res) => {
     }
 });
 
-async function iniciarServidor() {
-    try {
-        await mongoose.connect(MONGODB_URI);
-        console.log('Conectado ao MongoDB');
-
-        app.listen(PORT, () => {
-            console.log(`Servidor rodando na porta ${PORT}`);
+if (!IS_SERVERLESS) {
+    conectarMongo()
+        .then(() => {
+            console.log('Conectado ao MongoDB');
+            app.listen(PORT, () => {
+                console.log(`Servidor rodando na porta ${PORT}`);
+            });
+        })
+        .catch((err) => {
+            console.error('Erro ao conectar ao MongoDB:', err);
+            process.exit(1);
         });
-    } catch (err) {
-        console.error('Erro ao conectar ao MongoDB:', err);
-        process.exit(1);
-    }
 }
 
-iniciarServidor();
+module.exports = app;
