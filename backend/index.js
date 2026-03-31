@@ -44,6 +44,29 @@ function normalizarOrigin(origin) {
         .toLowerCase();
 }
 
+function origemPermitida(origin) {
+    const originNormalizada = normalizarOrigin(origin);
+
+    if (!originNormalizada) {
+        return true;
+    }
+
+    if (allowedOrigins.includes(originNormalizada)) {
+        return true;
+    }
+
+    try {
+        const { hostname } = new URL(originNormalizada);
+        if (hostname.endsWith('.vercel.app') && hostname.startsWith('site-curriculo-2-0')) {
+            return true;
+        }
+    } catch (err) {
+        return false;
+    }
+
+    return false;
+}
+
 const allowedOrigins = FRONTEND_URL
     .split(',')
     .map(normalizarOrigin)
@@ -55,17 +78,11 @@ if (process.env.NODE_ENV !== 'production') {
 
 app.use(cors({
     origin: (origin, callback) => {
-        if (!origin) {
+        if (origemPermitida(origin)) {
             return callback(null, true);
         }
 
-        const originNormalizada = normalizarOrigin(origin);
-
-        if (allowedOrigins.includes(originNormalizada)) {
-            return callback(null, true);
-        }
-
-        return callback(new Error('Origem nao permitida pelo CORS'));
+        return callback(null, false);
     },
 }));
 app.use(express.json());
