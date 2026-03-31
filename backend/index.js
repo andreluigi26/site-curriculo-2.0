@@ -7,7 +7,10 @@ const Projeto = require('./models/Projeto');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const MONGODB_URI = process.env.MONGODB_URI;
+const MONGODB_URI = (process.env.MONGODB_URI || '')
+    .trim()
+    .replace(/^['\"]|['\"]$/g, '')
+    .replace(/^=+/, '');
 const GITHUB_USERNAME = process.env.GITHUB_USERNAME;
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME;
