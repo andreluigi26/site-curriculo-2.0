@@ -195,6 +195,28 @@ h2 {
     line-height: 1.75;
 }
 
+.sobre-bloco {
+    margin-bottom: 24px;
+}
+
+.sobre-bloco h3 {
+    margin: 0 0 10px;
+    font-size: 18px;
+    color: var(--text);
+}
+
+.sobre-bloco ul {
+    margin: 0;
+    padding-left: 18px;
+    color: var(--muted);
+    display: grid;
+    gap: 8px;
+}
+
+.sobre-bloco li {
+    line-height: 1.65;
+}
+
 .timeline-card,
 .projeto-card {
     padding: 18px;
