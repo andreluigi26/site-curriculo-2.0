@@ -128,7 +128,7 @@ const secoes = document.querySelectorAll('main section[id]');
 const links = document.querySelectorAll('.nav-links a');
 
 function isDesktopTabs() {
-    return true;
+    return window.innerWidth >= 1024;
 }
 
 function atualizarLinkAtivo(sectionId) {
