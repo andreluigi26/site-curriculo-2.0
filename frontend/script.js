@@ -131,20 +131,15 @@ document.addEventListener('mousemove', (evento) => {
 
 const secoes = document.querySelectorAll('main section[id]');
 const links = document.querySelectorAll('.nav-links a');
-const mobileTabs = document.querySelectorAll('.mobile-tab');
 
 function isDesktopTabs() {
-    return true;
+    return window.innerWidth >= 1024;
 }
 
 function atualizarLinkAtivo(sectionId) {
     links.forEach((link) => {
         const ativa = link.getAttribute('data-section') === sectionId;
         link.classList.toggle('is-active', ativa);
-    });
-    mobileTabs.forEach((tab) => {
-        const ativa = tab.getAttribute('data-section') === sectionId;
-        tab.classList.toggle('is-active', ativa);
     });
 }
 
@@ -158,7 +153,6 @@ function ativarSecaoDesktop(sectionId) {
     }
 
     conteudo.classList.add('tab-mode');
-    const secaoAtiva = [...secoes].find((secao) => secao.id === sectionId);
 
     secoes.forEach((secao) => {
         const visivel = secao.id === sectionId;
@@ -186,19 +180,11 @@ function configurarModoNavegacao() {
         return;
     }
 
-    const alvoHash = window.location.hash.replace('#', '');
-    const secaoSalva = localStorage.getItem(LAST_SECTION_KEY) || '';
-    const hashValida = [...secoes].some((secao) => secao.id === alvoHash);
-    const secaoSalvaValida = [...secoes].some((secao) => secao.id === secaoSalva);
-    const secaoInicial = hashValida
-        ? alvoHash
-        : (secaoSalvaValida ? secaoSalva : secoes[0].id);
-
     if (isDesktopTabs()) {
-        ativarSecaoDesktop(secaoInicial);
-        if (!hashValida) {
-            window.history.replaceState(null, '', `#${secaoInicial}`);
-        }
+        // Carrega vazio no desktop: conteúdo aparece só após clique.
+        conteudo.classList.add('tab-mode');
+        secoes.forEach((secao) => secao.classList.remove('is-visible'));
+        atualizarLinkAtivo('');
         return;
     }
 
@@ -239,38 +225,7 @@ links.forEach((link) => {
     });
 });
 
-window.addEventListener('hashchange', () => {
-    if (!isDesktopTabs()) {
-        return;
-    }
-
-    const alvoHash = window.location.hash.replace('#', '');
-    if ([...secoes].some((secao) => secao.id === alvoHash)) {
-        ativarSecaoDesktop(alvoHash);
-    }
-});
-
-mobileTabs.forEach((tab) => {
-    tab.addEventListener('click', () => {
-        const sectionId = tab.getAttribute('data-section');
-        if (sectionId) {
-            ativarSecaoDesktop(sectionId);
-            window.history.replaceState(null, '', `#${sectionId}`);
-        }
-    });
-});
-
 window.addEventListener('resize', configurarModoNavegacao);
 
-configurарModoNavegacao();
+configurarModoNavegacao();
 carregarProjetos();
-
-const splash = document.getElementById('splash');
-const splashEntrar = document.getElementById('splash-entrar');
-
-if (splash && splashEntrar) {
-    splashEntrar.addEventListener('click', () => {
-        splash.classList.add('saindo');
-        splash.addEventListener('transitionend', () => splash.remove(), { once: true });
-    });
-}
