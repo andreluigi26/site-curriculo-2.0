@@ -165,26 +165,14 @@ h2 {
 .direita-rolavel.tab-mode {
     position: relative;
     display: block;
-    min-height: 480px;
-    overflow: hidden;
 }
 
 .direita-rolavel.tab-mode .secao-conteudo {
-    position: absolute;
-    inset: 0;
-    display: block;
-    opacity: 0;
-    transform: translateX(36px);
-    pointer-events: none;
-    animation: none;
-    transition: opacity 0.35s ease, transform 0.35s ease;
+    display: none;
 }
 
 .direita-rolavel.tab-mode .secao-conteudo.is-visible {
-    opacity: 1;
-    transform: translateX(0);
-    pointer-events: auto;
-    animation: fadeSlide 0.35s ease forwards;
+    display: block;
 }
 
 .secao-conteudo {
