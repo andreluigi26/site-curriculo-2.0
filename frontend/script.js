@@ -71,9 +71,6 @@ async function carregarProjetos()  {
         container.innerHTML = projetosRecentes.map((projeto) => {
             const descricao = formatarDescricaoProjeto(projeto.descricao);
             const tecnologias = (projeto.tecnologias || []).map((tech) => `<span class="tecnologia">${tech}</span>`).join(' ');
-            const linkProjeto = linkExternoValido(projeto.linkProjeto)
-                ? `<a href="${projeto.linkProjeto}" target="_blank" rel="noreferrer">Ver Projeto</a>`
-                : '<span class="link-disabled" aria-disabled="true">Sem demo</span>';
             const linkGithub = linkExternoValido(projeto.linkGithub)
                 ? `<a href="${projeto.linkGithub}" target="_blank" rel="noreferrer">GitHub</a>`
                 : '';
@@ -86,10 +83,7 @@ async function carregarProjetos()  {
                         <div class="tecnologias">
                             ${tecnologias}
                         </div>
-                        <div class="links">
-                            ${linkProjeto}
-                            ${linkGithub}
-                        </div>
+                        ${linkGithub ? `<div class="links">${linkGithub}</div>` : ''}
                     </div>
                 </div>
             `;
