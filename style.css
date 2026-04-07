@@ -165,26 +165,14 @@ h2 {
 .direita-rolavel.tab-mode {
     position: relative;
     display: block;
-    min-height: 480px;
-    overflow: hidden;
 }
 
 .direita-rolavel.tab-mode .secao-conteudo {
-    position: absolute;
-    inset: 0;
-    display: block;
-    opacity: 0;
-    transform: translateX(36px);
-    pointer-events: none;
-    animation: none;
-    transition: opacity 0.35s ease, transform 0.35s ease;
+    display: none;
 }
 
 .direita-rolavel.tab-mode .secao-conteudo.is-visible {
-    opacity: 1;
-    transform: translateX(0);
-    pointer-events: auto;
-    animation: fadeSlide 0.35s ease forwards;
+    display: block;
 }
 
 .secao-conteudo {
@@ -433,7 +421,7 @@ h2 {
 @media (max-width: 768px) {
     .main-container {
         gap: 16px;
-        padding: 28px 16px 52px;
+        padding: 28px 16px 96px;
     }
 
     .direita-rolavel {
@@ -457,4 +445,113 @@ h2 {
     .admin-projeto-item {
         flex-direction: column;
     }
+}
+
+/* Mobile bottom tab bar */
+.mobile-tabs {
+    display: none;
+}
+
+@media (max-width: 1023px) {
+    .nav-links {
+        display: none;
+    }
+
+    .mobile-tabs {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 50;
+        display: flex;
+        background: rgba(10, 22, 40, 0.95);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-top: 1px solid var(--line);
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+}
+
+.mobile-tab {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 16px 8px;
+    cursor: pointer;
+    transition: color 0.25s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.mobile-tab.is-active {
+    color: var(--accent);
+}
+
+/* Splash screen */
+.splash {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.6s ease;
+}
+
+.splash.saindo {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.splash-kicker {
+    margin: 0 0 16px;
+    color: var(--accent);
+    font-family: 'IBM Plex Mono', monospace;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-size: 12px;
+}
+
+.splash-nome {
+    margin: 0 0 48px;
+    font-size: clamp(36px, 10vw, 64px);
+    line-height: 1;
+    text-align: center;
+    padding: 0 20px;
+}
+
+.splash-nome::after {
+    content: '_';
+    color: var(--accent);
+    animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+    50% { opacity: 0; }
+}
+
+.splash-btn {
+    background: transparent;
+    border: 1px solid rgba(110, 231, 210, 0.45);
+    border-radius: 999px;
+    color: var(--accent);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 12px 32px;
+    cursor: pointer;
+    transition: background 0.25s ease;
+}
+
+.splash-btn:hover,
+.splash-btn:focus-visible {
+    background: rgba(110, 231, 210, 0.1);
+    outline: none;
 }

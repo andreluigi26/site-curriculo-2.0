@@ -114,21 +114,33 @@ async function carregarProjetos()  {
 const body = document.querySelector('body');
 const conteudo = document.getElementById('conteudo');
 
+let rafMouse = null;
+let mouseX = 0;
+let mouseY = 0;
+
 document.addEventListener('mousemove', (evento) => {
-    const { clientX, clientY } = evento;
-    body.style.background = `
-        radial-gradient(circle 450px at ${clientX}px ${clientY}px, rgba(110, 231, 210, 0.08), transparent 40%),
-        radial-gradient(circle at 20% 20%, rgba(110, 231, 210, 0.14), transparent 32%),
-        radial-gradient(circle at 85% 12%, rgba(134, 196, 255, 0.12), transparent 35%),
-        linear-gradient(180deg, #0a1628 0%, #08111f 100%)
-    `;
+    mouseX = evento.clientX;
+    mouseY = evento.clientY;
+    if (rafMouse) {
+        return;
+    }
+    rafMouse = requestAnimationFrame(() => {
+        body.style.background = `
+            radial-gradient(circle 450px at ${mouseX}px ${mouseY}px, rgba(110, 231, 210, 0.08), transparent 40%),
+            radial-gradient(circle at 20% 20%, rgba(110, 231, 210, 0.14), transparent 32%),
+            radial-gradient(circle at 85% 12%, rgba(134, 196, 255, 0.12), transparent 35%),
+            linear-gradient(180deg, #0a1628 0%, #08111f 100%)
+        `;
+        rafMouse = null;
+    });
 });
 
 const secoes = document.querySelectorAll('main section[id]');
 const links = document.querySelectorAll('.nav-links a');
+const mobileTabs = document.querySelectorAll('.mobile-tab');
 
 function isDesktopTabs() {
-    return window.innerWidth >= 1024;
+    return true;
 }
 
 function atualizarLinkAtivo(sectionId) {
@@ -136,17 +148,14 @@ function atualizarLinkAtivo(sectionId) {
         const ativa = link.getAttribute('data-section') === sectionId;
         link.classList.toggle('is-active', ativa);
     });
+    mobileTabs.forEach((tab) => {
+        const ativa = tab.getAttribute('data-section') === sectionId;
+        tab.classList.toggle('is-active', ativa);
+    });
 }
 
 function ajustarAlturaTabAtiva() {
-    if (!conteudo || !isDesktopTabs() || !conteudo.classList.contains('tab-mode')) {
-        return;
-    }
-
-    const secaoAtiva = [...secoes].find((secao) => secao.classList.contains('is-visible'));
-    if (secaoAtiva) {
-        conteudo.style.minHeight = `${secaoAtiva.scrollHeight + 24}px`;
-    }
+    // altura gerenciada automaticamente via display: none/block
 }
 
 function ativarSecaoDesktop(sectionId) {
@@ -247,7 +256,27 @@ window.addEventListener('hashchange', () => {
     }
 });
 
+mobileTabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+        const sectionId = tab.getAttribute('data-section');
+        if (sectionId) {
+            ativarSecaoDesktop(sectionId);
+            window.history.replaceState(null, '', `#${sectionId}`);
+        }
+    });
+});
+
 window.addEventListener('resize', configurarModoNavegacao);
 
-configurarModoNavegacao();
+configurарModoNavegacao();
 carregarProjetos();
+
+const splash = document.getElementById('splash');
+const splashEntrar = document.getElementById('splash-entrar');
+
+if (splash && splashEntrar) {
+    splashEntrar.addEventListener('click', () => {
+        splash.classList.add('saindo');
+        splash.addEventListener('transitionend', () => splash.remove(), { once: true });
+    });
+}
